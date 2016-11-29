@@ -18,4 +18,11 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^userapi/', 'ceoOnline.views.userinapi'),
+    url(r'^wenzisousuo/', 'ceoOnline.views.wenzisousuo'),
+    url(r'^shaixuan/', 'ceoOnline.views.shaixuan'),
+    url(r'^friend/', 'ceoOnline.views.friendapi'),
+    url(r'^imageup/', 'ceoOnline.views.ImageUpApi'),
+    url(r'^news/', 'ceoOnline.views.newsapi'),
+
 ]
