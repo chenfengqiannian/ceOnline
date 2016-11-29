@@ -21,15 +21,21 @@ class user(models.Model):
     bankuai=models.CharField(u'板块',max_length=255,blank=True)
     onlinetime=models.DateTimeField()
     didian=models.ForeignKey('tb_prov_city_area_street',blank=True,null=True)
+    def __unicode__(self):
+        return self.phone.__str__()
 class setting(models.Model):
     name=models.CharField(u'名称',max_length=255)
     value=models.TextField(u'内容')
+    def __unicode__(self):
+        return self.name.__str__()
 class news(models.Model):
     fromuser=models.ForeignKey(user,related_name="renews_from")
     touser=models.ForeignKey(user,related_name="renews_to")
     neirong=models.TextField(u'内容')
     createtime = models.DateTimeField(auto_now=True)
     yidu=models.BooleanField(default=False)
+    def __unicode__(self):
+        return self.fromuser.name.__str__()
 class friend(models.Model):
     fromuser=models.ForeignKey(user,related_name="refriend_from")
     touser=models.ForeignKey(user,related_name="refriend_to")
@@ -37,8 +43,12 @@ class friend(models.Model):
     yidu = models.BooleanField(default=False)
     state=models.IntegerField(choices=statechoice,default=0)
     createtime=models.DateTimeField(auto_now=True)
+    def __unicode__(self):
+        return self.fromuser.name.__str__()
 class tb_prov_city_area_street(models.Model):
     code=models.IntegerField(blank=True)
     parentId=models.IntegerField(blank=True)
     name=models.CharField(max_length=50,blank=True)
     level=models.IntegerField(blank=True)
+    def __unicode__(self):
+        return self.name.__str__()
