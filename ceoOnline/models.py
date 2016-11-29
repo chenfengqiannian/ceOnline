@@ -11,23 +11,23 @@ class user(models.Model):
     zhiwu = models.CharField(u'职务', max_length=255,blank=True)
     dizhi=models.CharField(u'地址',max_length=255,blank=True)
     name=models.CharField(u'名称',max_length=255,blank=True)
-    touxiang = models.ImageField(u'头像',blank=True)
-    image1 = models.ImageField(u'图像1',blank=True)
-    image2 = models.ImageField(u'图像2',blank=True)
-    image3 = models.ImageField(u'图像3',blank=True)
-    image4 = models.ImageField(u'图像4',blank=True)
-    image5 = models.ImageField(u'图像5',blank=True)
+    touxiang = models.ImageField(u'头像',blank=True,upload_to='images')
+    image1 = models.ImageField(u'图像1',blank=True,upload_to='images')
+    image2 = models.ImageField(u'图像2',blank=True,upload_to='images')
+    image3 = models.ImageField(u'图像3',blank=True,upload_to='images')
+    image4 = models.ImageField(u'图像4',blank=True,upload_to='images')
+    image5 = models.ImageField(u'图像5',blank=True,upload_to='images')
     isVIP=models.BooleanField(u'是否金色名称',default=False)
     bankuai=models.CharField(u'板块',max_length=255,blank=True)
     onlinetime=models.DateTimeField()
     didian=models.ForeignKey('tb_prov_city_area_street',blank=True,null=True)
     def __unicode__(self):
-        return self.phone.__str__()
+        return self.phone
 class setting(models.Model):
     name=models.CharField(u'名称',max_length=255)
     value=models.TextField(u'内容')
     def __unicode__(self):
-        return self.name.__str__()
+        return self.name
 class news(models.Model):
     fromuser=models.ForeignKey(user,related_name="renews_from")
     touser=models.ForeignKey(user,related_name="renews_to")
@@ -35,7 +35,7 @@ class news(models.Model):
     createtime = models.DateTimeField(auto_now=True)
     yidu=models.BooleanField(default=False)
     def __unicode__(self):
-        return self.fromuser.name.__str__()
+        return self.fromuser.name
 class friend(models.Model):
     fromuser=models.ForeignKey(user,related_name="refriend_from")
     touser=models.ForeignKey(user,related_name="refriend_to")
@@ -44,11 +44,11 @@ class friend(models.Model):
     state=models.IntegerField(choices=statechoice,default=0)
     createtime=models.DateTimeField(auto_now=True)
     def __unicode__(self):
-        return self.fromuser.name.__str__()
+        return self.fromuser.name
 class tb_prov_city_area_street(models.Model):
     code=models.IntegerField(blank=True)
     parentId=models.IntegerField(blank=True)
     name=models.CharField(max_length=50,blank=True)
     level=models.IntegerField(blank=True)
     def __unicode__(self):
-        return self.name.__str__()
+        return self.name
