@@ -94,15 +94,7 @@ def userinapi(request):
                 else:
 
                     myuser = user.objects.create(phone=data['phone'], password=data['userpw'],onlinetime=datetime.now())
-                    myuser.dizhi=data['didian']
-                    tb=tb_prov_city_area_street.objects.filter(name=data['didian'])
-                    if(tb.count>=1):
-                        myuser.didian=tb[0]
 
-                    myuser.jianjie=data['jianjie']
-                    myuser.zhiwu = data['zhiwu']
-                    myuser.name = data['name']
-                    myuser.gongsi=data['gongsi']
 
                     myuser.save()
 
@@ -123,6 +115,16 @@ def userinapi(request):
             reqkey = data.keys()
 
             for k in reqkey:
+                if k=='didian':
+                    clphone.dizhi = data['didian']
+                    tb = tb_prov_city_area_street.objects.filter(name=data['didian'])
+                    if (tb.count >= 1):
+                        clphone.didian = tb[0]
+
+                    clphone.jianjie = data['jianjie']
+                    clphone.zhiwu = data['zhiwu']
+                    clphone.name = data['name']
+                    clphone.gongsi = data['gongsi']
                 setattr(clphone, k, data[k])
             clphone.save()
             return HttpResponse("ok")
