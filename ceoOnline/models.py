@@ -10,6 +10,7 @@ class user(models.Model):
     jianjie = models.TextField(u'简介')
     zhiwu = models.CharField(u'职务', max_length=255,blank=True)
     dizhi=models.CharField(u'地址',max_length=255,blank=True)
+    gongsi=models.CharField(u'公司',max_length=255,blank=True)
     name=models.CharField(u'名称',max_length=255,blank=True)
     touxiang = models.ImageField(u'头像',blank=True,upload_to='images')
     image1 = models.ImageField(u'图像1',blank=True,upload_to='images')
@@ -18,7 +19,7 @@ class user(models.Model):
     image4 = models.ImageField(u'图像4',blank=True,upload_to='images')
     image5 = models.ImageField(u'图像5',blank=True,upload_to='images')
     isVIP=models.BooleanField(u'是否金色名称',default=False)
-    bankuai=models.CharField(u'板块',max_length=255,blank=True)
+    bankuai=models.CharField(u'板块',max_length=255,default=u"免费版")
     onlinetime=models.DateTimeField()
     didian=models.ForeignKey('tb_prov_city_area_street',blank=True,null=True)
     def __unicode__(self):
@@ -32,7 +33,7 @@ class news(models.Model):
     fromuser=models.ForeignKey(user,related_name="renews_from")
     touser=models.ForeignKey(user,related_name="renews_to")
     neirong=models.TextField(u'内容')
-    createtime = models.DateTimeField(auto_now=True)
+    createtime = models.DateTimeField(auto_now_add=True)
     yidu=models.BooleanField(default=False)
     def __unicode__(self):
         return self.fromuser.name
@@ -42,7 +43,7 @@ class friend(models.Model):
     statechoice=((0,u'请求'),(1,u'好友'))
     yidu = models.BooleanField(default=False)
     state=models.IntegerField(choices=statechoice,default=0)
-    createtime=models.DateTimeField(auto_now=True)
+    createtime=models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.fromuser.name
 class tb_prov_city_area_street(models.Model):

@@ -24,6 +24,16 @@ def usertodict(muser):
         userdict[field] = getattr(muser, field)
     return userdict
 
+def listnews(fromuser,touser):
+
+    qs1 = fromuser.renews_from.all().filter(touser=touser)
+    qs2 = touser.renews_to.all().filter(fromuser=fromuser)
+
+    qs = qs1 | qs2
+
+    newsqs = qs.distinct()
+    newsqs.order_by("-createtime")
+    return newsqs[0]
 
 def ImageUpApi(request):
     try:
@@ -40,12 +50,18 @@ def ImageUpApi(request):
             mPhone = request.POST['phone']
 
             mUser = user.objects.get(phone=mPhone)
-            mUser.image1 = imageData1
-            mUser.image2 = imageData2
-            mUser.image3 = imageData3
-            mUser.image4 = imageData4
-            mUser.image5 = imageData5
-            mUser.touxiang=touxingData
+            if imageData1 !=None:
+                mUser.image1 = imageData1
+            if imageData2 != None:
+                mUser.image2 = imageData2
+            if imageData3 != None:
+                mUser.image3 = imageData3
+            if imageData4 != None:
+                mUser.image4 = imageData4
+            if imageData5 != None:
+                mUser.image5 = imageData5
+            if touxingData != None:
+                mUser.touxiang=touxingData
             mUser.save()
             return HttpResponse('ok')
         if request.method == 'GET':
@@ -86,6 +102,7 @@ def userinapi(request):
                     myuser.jianjie=data['jianjie']
                     myuser.zhiwu = data['zhiwu']
                     myuser.name = data['name']
+                    myuser.gongsi=data['gongsi']
 
                     myuser.save()
 
@@ -119,6 +136,10 @@ def userinapi(request):
             usertdict=usertodict(muser)
             muser.onlinetime = datetime.now()
             muser.save()
+            sets=setting.objects.all()
+            for i in sets:
+                usertdict[i.name]=i.value
+
             return JsonResponse(usertdict,safe=False)
 
 
@@ -175,6 +196,11 @@ def shaixuan(request):
                 else:
                     tb=tb_prov_city_area_street.objects.get(code=code)
                     muser=tb.user_set.all()
+                    bankuai=request.GET.get("bankuai", -1)
+                    if(bankuai!=-1):
+                        muser=muser.filter(bankuai=bankuai)
+
+
                     userlist = []
                     for mu in muser:
 
@@ -198,10 +224,16 @@ def friendapi(request):
         if request.method == 'GET':
             phone = request.GET.get('phone',-1)
             state=request.GET.get('state',-1)
+            tophone = request.GET.get('tophone', -1)
+            if(tophone!=-1):
+                touser = user.objects.get(phone=tophone)
+                qs2 = touser.refriend_to.all()
+                qs1 = touser.refriend_to.all()
 
-            muser=user.objects.get(phone=phone)
-            qs1=muser.refriend_from.all()
-            qs2=muser.refriend_to.all()
+            else:
+                muser=user.objects.get(phone=phone)
+                qs1=muser.refriend_from.all()
+                qs2=muser.refriend_to.all()
 
             qs=qs1 |qs2
 
@@ -221,9 +253,14 @@ def friendapi(request):
                 frienddict['fromimage'] = mu.fromuser.touxiang.name
                 frienddict['tophone'] = mu.touser.phone
                 frienddict['toimage'] = mu.touser.touxiang.name
-                frienddict['state'] = mu.touser.state
+                frienddict['state'] = mu.state
 
-                friendlist.append(frienddict(mu))
+                frienddict['fromname'] = mu.fromuser.name
+                frienddict['toname'] = mu.touser.name
+                frienddict['id'] = mu.id
+                frienddict['listnews'] = listnews(mu.fromuser,mu.touser).neirong
+                frienddict['listnewstime'] = listnews(mu.fromuser, mu.touser).createtime.strftime("%Y-%m-%d %H:%M:%S")
+                friendlist.append(frienddict)
             moutdict={}
             moutdict['weidu']=weidu
             moutdict['data']=friendlist
@@ -232,6 +269,9 @@ def friendapi(request):
             data = json.loads(request.body)
             if(data.get('id',-1)!=-1):
                 mf=friend.objects.get(id=data['id'])
+                if(data.get('state',0)==-1):
+                    mf.delete()
+                    return HttpResponse("ok")
                 mf.state=data.get('state',0)
                 mf.save()
                 return HttpResponse("ok")
@@ -243,7 +283,7 @@ def friendapi(request):
             fromuser=user.objects.get(phone=dataphone)
             touser=user.objects.get(phone=tophone)
 
-            friend.objects.create(fromuser=fromuser,touser=touser,state=state)
+            friend.objects.get_or_create(fromuser=fromuser,touser=touser,state=state)
             return HttpResponse('ok')
 
 
@@ -271,17 +311,28 @@ def newsapi(request):
     try:
         if request.method == 'GET':
             phone = request.GET.get('phone', -1)
+            to=request.GET.get('to',-1)
+
+            if(to==-1):
+
+                muser = user.objects.get(phone=phone)
+                qs1 = muser.renews_from.all()
+                qs2 = muser.renews_to.all()
+
+                qs = qs1 | qs2
 
 
-            muser = user.objects.get(phone=phone)
-            qs1 = muser.renews_from.all()
-            qs2 = muser.renews_to.all()
 
-            qs = qs1 | qs2
+                newsqs = qs.distinct()
+            else:
+                muser = user.objects.get(phone=phone)
+                touser=user.objects.get(phone=to)
+                qs1 = muser.renews_from.all().filter(touser=touser)
+                qs2 = touser.renews_to.all().filter(fromuser=muser)
 
+                qs = qs1 | qs2
 
-
-            newsqs = qs.distinct()
+                newsqs = qs.distinct()
             weidu = newsqs.filter(yidu=False).count()
             for du in qs:
                 du.yidu = True
@@ -290,6 +341,7 @@ def newsapi(request):
 
 
             userlist = []
+            newsqs.order_by("-createtime")
             for mu in newsqs:
                 newsdict = {}
                 newsdict['createtime'] = mu.createtime.strftime("%Y-%m-%d %H:%M:%S")
@@ -312,6 +364,7 @@ def newsapi(request):
             neirong = data['neirong']
             fromuser = user.objects.get(phone=dataphone)
             touser = user.objects.get(phone=tophone)
+
 
             news.objects.create(fromuser=fromuser, touser=touser, neirong=neirong)
             return HttpResponse('ok')
