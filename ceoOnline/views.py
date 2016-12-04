@@ -93,7 +93,7 @@ def userinapi(request):
                     return HttpResponseForbidden()
                 else:
 
-                    myuser = user.objects.create(phone=data['phone'], password=data['password'],onlinetime=datetime.now())
+                    myuser = user.objects.create(phone=data['phone'], password=data['userpw'],onlinetime=datetime.now())
                     myuser.dizhi=data['didian']
                     tb=tb_prov_city_area_street.objects.filter(name=data['didian'])
                     if(tb.count>=1):
