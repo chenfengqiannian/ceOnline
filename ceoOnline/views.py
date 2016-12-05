@@ -122,13 +122,10 @@ def userinapi(request):
                 if k=='didian':
                     clphone.dizhi = data['didian']
                     tb = tb_prov_city_area_street.objects.filter(name=data['didian'])
-                    if (tb.count >= 1):
+                    if (tb.count() >= 1):
                         clphone.didian = tb[0]
 
-                    clphone.jianjie = data['jianjie']
-                    clphone.zhiwu = data['zhiwu']
-                    clphone.name = data['name']
-                    clphone.gongsi = data['gongsi']
+                    continue
                 setattr(clphone, k, data[k])
             clphone.save()
             return HttpResponse("ok")
@@ -160,6 +157,7 @@ def userinapi(request):
 
     except Exception, e:
             print e
+            print request.body
             return HttpResponseServerError(e)
 def wenzisousuo(request):
     try:
