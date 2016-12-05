@@ -36,7 +36,7 @@ class news(models.Model):
     createtime = models.DateTimeField(auto_now_add=True)
     yidu=models.BooleanField(default=False)
     def __unicode__(self):
-        return self.fromuser.name
+        return self.neirong
 class friend(models.Model):
     fromuser=models.ForeignKey(user,related_name="refriend_from")
     touser=models.ForeignKey(user,related_name="refriend_to")
