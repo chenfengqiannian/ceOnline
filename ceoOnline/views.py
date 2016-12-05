@@ -33,7 +33,11 @@ def listnews(fromuser,touser):
 
     newsqs = qs.distinct()
     newsqs.order_by("-createtime")
-    return newsqs[0]
+    if(newsqs.count()>0):
+
+        return newsqs[0]
+    else:
+        return None
 
 def ImageUpApi(request):
     try:
@@ -260,8 +264,13 @@ def friendapi(request):
                 frienddict['fromname'] = mu.fromuser.name
                 frienddict['toname'] = mu.touser.name
                 frienddict['id'] = mu.id
-                frienddict['listnews'] = listnews(mu.fromuser,mu.touser).neirong
-                frienddict['listnewstime'] = listnews(mu.fromuser, mu.touser).createtime.strftime("%Y-%m-%d %H:%M:%S")
+                li=listnews(mu.fromuser,mu.touser)
+                if(li):
+                    frienddict['listnews'] = listnews(mu.fromuser,mu.touser).neirong
+                    frienddict['listnewstime'] = listnews(mu.fromuser, mu.touser).createtime.strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    frienddict['listnews'] =""
+                    frienddict['listnewstime']=mu.createtime.strftime("%Y-%m-%d %H:%M:%S")
                 friendlist.append(frienddict)
             moutdict={}
             moutdict['weidu']=weidu
@@ -331,8 +340,9 @@ def newsapi(request):
                 touser=user.objects.get(phone=to)
                 qs1 = muser.renews_from.all().filter(touser=touser)
                 qs2 = touser.renews_to.all().filter(fromuser=muser)
-
-                qs = qs1 | qs2
+                qs3= muser.renews_to.all().filter(fromuser=touser)
+                qs4=touser.renews_from.all().filter(touser=muser)
+                qs = qs1 | qs2 |qs3 |qs4
 
                 newsqs = qs.distinct()
             weidu = newsqs.filter(yidu=False).count()
