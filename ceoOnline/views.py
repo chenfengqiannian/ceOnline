@@ -121,6 +121,7 @@ def userinapi(request):
             for k in reqkey:
                 if k=='didian':
                     clphone.dizhi = data['didian']
+                    continue
 
                 setattr(clphone, k, data[k])
             clphone.save()
