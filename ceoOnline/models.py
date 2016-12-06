@@ -20,6 +20,7 @@ class user(models.Model):
     image5 = models.ImageField(u'图像5',blank=True,upload_to='images')
     isVIP=models.BooleanField(u'是否金色名称',default=False)
     bankuai=models.CharField(u'板块',max_length=255,default=u"免费版")
+    isJinru=models.BooleanField(u'是否邀请进入',default=False)
     onlinetime=models.DateTimeField()
     didian=models.ForeignKey('tb_prov_city_area_street',blank=True,null=True)
     def __unicode__(self):

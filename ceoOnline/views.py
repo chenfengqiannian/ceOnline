@@ -121,11 +121,7 @@ def userinapi(request):
             for k in reqkey:
                 if k=='didian':
                     clphone.dizhi = data['didian']
-                    tb = tb_prov_city_area_street.objects.filter(name=data['didian'])
-                    if (tb.count() >= 1):
-                        clphone.didian = tb[0]
 
-                    continue
                 setattr(clphone, k, data[k])
             clphone.save()
             return HttpResponse("ok")
@@ -180,6 +176,7 @@ def shaixuan(request):
     try:
         if request.method == 'GET':
             code = request.GET.get('code',-1)
+            phone=request.GET.get('phone', -1)
             if(code==-1):
                 tb_set=tb_prov_city_area_street.objects.filter(level=1)
 
@@ -199,16 +196,27 @@ def shaixuan(request):
                     return JsonResponse(shaixuandict,safe=False)
                 else:
                     tb=tb_prov_city_area_street.objects.get(code=code)
-                    muser=tb.user_set.all()
+
+                    if (phone != -1):
+                        tmuser = user.objects.get(phone=phone)
+                        tmuser.didian = tb
+                        tmuser.save()
+                    muser = tb.user_set.all()
                     bankuai=request.GET.get("bankuai", -1)
                     if(bankuai!=-1):
+                        tmuser.bankuai = bankuai
+                        tmuser.save()
                         muser=muser.filter(bankuai=bankuai)
+
+
 
 
                     userlist = []
                     for mu in muser:
 
                         userlist.append(usertodict(mu))
+
+
                     return JsonResponse(userlist,safe=False)
 
 
